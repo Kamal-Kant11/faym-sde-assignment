@@ -5,4 +5,6 @@ const router = express.Router();
 
 router.post("/advance", runAdvancePayout);
 
+router.put("/reconcile/:saleId", reconcileSale);
+
 export default router;

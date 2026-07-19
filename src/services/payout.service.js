@@ -75,4 +75,92 @@ const runAdvancePayout = async () => {
 
 };
 
-export { runAdvancePayout };
+const reconcileSale = async (saleId, status) => {
+
+    try {
+        const sale = await saleModel.findById(saleId);
+
+        if (!sale) {
+            throw new Error("Sale not found");
+        }
+
+        if (sale.isSettled) {
+            throw new Error("Sale already reconciled");
+        }
+
+        if (!["APPROVED", "REJECTED"].includes(status)) {
+            throw new Error("Invalid status");
+        }
+
+        if (status === "APPROVED") {
+
+            const remainingAmount =
+                sale.earning - sale.advanceAmount;
+
+            await payoutModel.create({
+                userId: sale.userId,
+                saleId: sale._id,
+                amount: remainingAmount,
+                type: "FINAL",
+                status: "SUCCESS"
+            });
+
+            await userModel.findByIdAndUpdate(
+                sale.userId,
+                {
+                    $inc: {
+                        withdrawableBalance: remainingAmount
+                    }
+                }
+            );
+
+            const updatedSale = await saleModel.findByIdAndUpdate(
+                sale._id,
+                {
+                    status: "APPROVED",
+                    isSettled: true
+                }, { new: true }
+            );
+
+            return updatedSale;
+        }
+        else {
+
+            const deduction = sale.advanceAmount;
+
+            await payoutModel.create({
+                userId: sale.userId,
+                saleId: sale._id,
+                amount: -deduction,
+                type: "ADJUSTMENT",
+                status: "SUCCESS"
+            });
+
+            await userModel.findByIdAndUpdate(
+                sale.userId,
+                {
+                    $inc: {
+                        withdrawableBalance: -deduction
+                    }
+                }
+            );
+
+            const updatedSale = await saleModel.findByIdAndUpdate(
+                sale._id,
+                {
+                    status: "REJECTED",
+                    isSettled: true
+                }, { new: true }
+            );
+
+            return updatedSale;
+
+        }
+
+    } catch (err) {
+        throw new Error(err.message);
+    }
+
+}
+
+export { runAdvancePayout, reconcileSale };
