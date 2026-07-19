@@ -4,7 +4,7 @@ import userModel from "../models/user.model.js";
 
 const ADVANCE_PERCENTAGE = 10;
 
-const runAdvancePayout = async () => {
+export const runAdvancePayoutService = async () => {
 
     try {
         const sales = await saleModel.find({
@@ -75,7 +75,7 @@ const runAdvancePayout = async () => {
 
 };
 
-const reconcileSale = async (saleId, status) => {
+export const reconcileSaleService = async (saleId, status) => {
 
     try {
         const sale = await saleModel.findById(saleId);
@@ -162,5 +162,3 @@ const reconcileSale = async (saleId, status) => {
     }
 
 }
-
-export { runAdvancePayout, reconcileSale };

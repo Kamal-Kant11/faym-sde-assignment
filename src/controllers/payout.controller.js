@@ -1,9 +1,9 @@
-import payoutService from "../services/payout.service.js"
+import { reconcileSaleService, runAdvancePayoutService } from "../services/payout.service.js";
 
 export const runAdvancePayout = async (req, res) => {
     try {
 
-        const result = await payoutService.runAdvancePayout();
+        const result = await runAdvancePayoutService();
 
         res.status(200).json({
             success: true,
@@ -27,7 +27,7 @@ export const reconcileSale = async (req, res) => {
         const { saleId } = req.params;
         const { status } = req.body;
 
-        const result = await payoutService.reconcileSale(
+        const result = await reconcileSaleService(
             saleId,
             status
         );

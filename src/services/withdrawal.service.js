@@ -1,7 +1,7 @@
 import userModel from "../models/user.model.js";
 import withdrawalModel from "../models/withdrawal.model.js";
 
-const createWithdrawal = async (userId, amount) => {
+export const createWithdrawalService = async (userId, amount) => {
     try {
 
         const user = await userModel.findById(userId);
@@ -51,7 +51,7 @@ const createWithdrawal = async (userId, amount) => {
     }
 }
 
-const failWithdrawal = async (withdrawalId) => {
+export const failWithdrawalService = async (withdrawalId) => {
 
     try {
         const withdrawal = await withdrawalModel.findById(withdrawalId);
@@ -81,5 +81,3 @@ const failWithdrawal = async (withdrawalId) => {
         throw new Error(err.message);
     }
 }
-
-export { createWithdrawal, failWithdrawal }
